@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.mimose.component.jwt.starter.confiuration.JwtConfiuration,\
+  com.mimose.component.jwt.starter.aop.MLoginAspect
