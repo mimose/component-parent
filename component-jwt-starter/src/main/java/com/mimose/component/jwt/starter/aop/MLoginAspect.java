@@ -25,8 +25,9 @@ import java.util.List;
  * @Author ccy
  * @Date 2020/1/3
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
+@Deprecated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MLoginAspect {
 

@@ -1,12 +1,17 @@
 package com.mimose.component.jwt.starter.component;
 
 import com.mimose.component.jwt.starter.confiuration.JwtStorage;
+import com.mimose.component.jwt.starter.enums.AlgorithmEnum;
+import com.mimose.component.jwt.starter.util.RSAUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
-import javax.crypto.SecretKey;
+import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,8 +34,12 @@ public class JwtOperator {
      */
     public Claims getClaimsFromToken(String token) {
         try {
+            Pair<Key, SignatureAlgorithm> ksPair = this.getKSPair(false);
+            if(ObjectUtils.isEmpty(ksPair)){
+                return null;
+            }
             return Jwts.parser()
-                    .setSigningKey(jwtStorage.getJwtProperties().getSecret().getBytes())
+                    .setSigningKey(ksPair.getKey())
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | IllegalArgumentException e) {
@@ -76,20 +85,21 @@ public class JwtOperator {
      * @param claims 用户信息
      * @return token
      */
-    public String generateToken(Map<String, Object> claims) {
+    public String generateToken(Map<String, Object> claims) throws Exception {
         Date createdTime = new Date();
         Date expirationTime = this.getExpirationTime();
 
-        byte[] keyBytes = jwtStorage.getJwtProperties().getSecret().getBytes();
-        SecretKey key = Keys.hmacShaKeyFor(keyBytes);
-
+        Pair<Key, SignatureAlgorithm> ksPair = this.getKSPair(true);
+        if(ObjectUtils.isEmpty(ksPair)){
+            return null;
+        }
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(createdTime)
                 .setExpiration(expirationTime)
                 // 你也可以改用你喜欢的算法
                 // 支持的算法详见：https://github.com/jwtk/jjwt#features
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(ksPair.getKey(), ksPair.getValue())
                 .compact();
     }
 
@@ -101,5 +111,33 @@ public class JwtOperator {
      */
     public Boolean validateToken(String token) {
         return !isTokenExpired(token);
+    }
+
+    /**
+     * 获取加解密key和算法
+     * @param encrypt 是否是加密
+     * @return
+     */
+    private Pair<Key, SignatureAlgorithm> getKSPair(boolean encrypt) {
+        try {
+            String algorithm = this.jwtStorage.getJwtProperties().getAlgorithm();
+            Key key;
+            SignatureAlgorithm signatureAlgorithm;
+            String secret = encrypt? this.jwtStorage.getJwtProperties().getEncryptSecret() : this.jwtStorage.getJwtProperties().getEncryptSecret();
+            if(StringUtils.isEmpty(algorithm) || AlgorithmEnum.HS256.getKey().equals(algorithm)){
+                byte[] keyBytes = jwtStorage.getJwtProperties().getEncryptSecret().getBytes();
+                key = Keys.hmacShaKeyFor(keyBytes);
+                signatureAlgorithm = AlgorithmEnum.HS256.getAlgorithm();
+            }else if(AlgorithmEnum.RSA256.getKey().equals(algorithm)){
+                key = RSAUtil.getPrivateKey(secret);
+                signatureAlgorithm = AlgorithmEnum.RSA256.getAlgorithm();
+            }else{
+                return null;
+            }
+            return new Pair<>(key, signatureAlgorithm);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

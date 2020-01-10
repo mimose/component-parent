@@ -16,7 +16,23 @@ public class JwtProperties implements Serializable {
 
     private static final long serialVersionUID = -6236397139503897945L;
 
-    private String secret;
+    /**
+     * 加密密钥
+     */
+    private String encryptSecret;
 
+    /**
+     * 解密密钥
+     */
+    private String decryptSecret;
+
+    /**
+     * 过期时间
+     */
     private Long expireTimeInSecond;
+
+    /**
+     * 使用哪种加密算法，默认使用HS256
+     */
+    private String algorithm;
 }
