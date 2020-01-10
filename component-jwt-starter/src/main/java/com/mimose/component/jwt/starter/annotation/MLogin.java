@@ -7,6 +7,7 @@ import java.lang.annotation.*;
  * @Author ccy
  * @Date 2020/1/3
  */
+@Deprecated
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
