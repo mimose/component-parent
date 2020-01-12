@@ -18,6 +18,7 @@
 
     <modules>
         <module>component-jwt-starter</module>
+        <module>component-redisson-starter</module>
     </modules>
 
     <properties>
@@ -28,6 +29,9 @@
         <hutool.version>5.0.4</hutool.version>
         <fastjson.version>1.2.47</fastjson.version>
         <gson.version>2.7</gson.version>
+
+        <component.jwt.version>0.1.0-SNAPSHOT</component.jwt.version>
+        <component.redisson.version>0.1.0-SNAPSHOT</component.redisson.version>
     </properties>
 
     <dependencyManagement>

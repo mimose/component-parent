@@ -1,0 +1,41 @@
+package com.mimose.component.redisson.cache.config;
+
+import com.mimose.component.redisson.common.config.RedissonClientConfiguration;
+import com.mimose.component.redisson.common.util.RedissonConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
+import org.redisson.spring.cache.RedissonSpringCacheManager;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
+
+/**
+ * @Description redisson缓存装配
+ * @Author ccy
+ * @Date 2019/12/25
+ */
+@Slf4j
+@Configuration
+@ConditionalOnBean(value = RedissonClientConfiguration.class)
+@EnableConfigurationProperties(RedissonCacheProperties.class)
+public class RedissonCacheConfiguration {
+
+    @Bean
+    CacheManager cacheManager(RedissonClient redissonClient, RedissonCacheProperties redissonCacheProperties) {
+        try {
+            log.info("start redisson cache manager ...");
+            String configLocation = redissonCacheProperties == null || StringUtils.isEmpty(redissonCacheProperties.getConfig()) ? RedissonConstants.DEFAULT_CACHE_CONFIGLOCATION : redissonCacheProperties.getConfig();
+            RedissonSpringCacheManager redissonSpringCacheManager = new RedissonSpringCacheManager(redissonClient, configLocation);
+
+            log.info("start redisson cache manager success");
+            return redissonSpringCacheManager;
+        } catch (Exception e) {
+            log.info("start redisson cache manager error", e);
+            return null;
+        }
+    }
+
+}
