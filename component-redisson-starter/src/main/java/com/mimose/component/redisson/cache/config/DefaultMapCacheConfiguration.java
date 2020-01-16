@@ -22,6 +22,7 @@ public class DefaultMapCacheConfiguration {
     public void afterClient(){
         log.info("start init default map cache util ...");
         CacheUtil.setRedissonClient(null);
+        CacheUtil.noRedisson();
         log.info("start init default map cache util success");
     }
 }

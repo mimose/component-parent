@@ -23,15 +23,21 @@ public class CacheUtil {
 
     private static RedissonClient redissonClient;
 
+    private static boolean withRedisson = true;
+
     private static Map<String, ConcurrentMap<String, Object>> cacheMap = new HashMap<>();
-
-    private static final Integer INITIAL_CAPACITY = 2<<4;
-
-    private static final String HOLD_TIME = "_HOLD_TIME";
 
     public static void setRedissonClient(RedissonClient redissonClient) {
         CacheUtil.redissonClient = redissonClient;
     }
+
+    public static void noRedisson() {
+        CacheUtil.withRedisson = false;
+    }
+
+    private static final Integer INITIAL_CAPACITY = 2<<4;
+
+    private static final String HOLD_TIME = "_HOLD_TIME";
 
     /**
      * 是否存在缓存
@@ -69,21 +75,21 @@ public class CacheUtil {
      */
     public static <T> T get(String mapKey, String cacheKey, Class<T> clazz){
         AssertMapKey(mapKey);
-        return AfterGet(cacheKey, containKeys(mapKey, cacheKey)? clazz.cast(cacheMap.get(mapKey).get(cacheKey)) : null);
+        return AfterGet(mapKey, cacheKey, containKeys(mapKey, cacheKey)? clazz.cast(cacheMap.get(mapKey).get(cacheKey)) : null);
     }
 
     /**
-     * 非redis的情况，存在过期存储的情况，需要判断是否过期
+     * 非redis的情况，存在过期存储的情况，需要判断是否过期，并删除
+     * @param mapKey
      * @param cacheKey
-     * @param t
+     * @param value
      * @param <T>
      * @return
      */
-    private static <T> T AfterGet(String cacheKey, T value) {
-        if(redissonClient == null && !ObjectUtils.isEmpty(value)){
-            Long expiryTime = (Long) cacheMap.get(cacheKey).get(cacheKey + HOLD_TIME);
-            if(System.currentTimeMillis() > expiryTime){
-                value = null;
+    private static <T> T AfterGet(String mapKey, String cacheKey, T value) {
+        if(!withRedisson && !ObjectUtils.isEmpty(value)){
+            if(validExpiryTime(mapKey, cacheKey)){
+                return null;
             }
         }
         return value;
@@ -101,7 +107,7 @@ public class CacheUtil {
         AssertMapKey(mapKey);
         if(containKeys(mapKey, cacheKey)){
             List<Object> value = ArrayList.class.cast(cacheMap.get(mapKey).get(cacheKey));
-            return value.stream().map(clazz::cast).collect(Collectors.toList());
+            return AfterGet(mapKey, cacheKey, value.stream().map(clazz::cast).collect(Collectors.toList()));
         }
         return null;
     }
@@ -116,9 +122,27 @@ public class CacheUtil {
     public static <T> Map<String, T> getAll(String mapKey, Class<T> clazz){
         AssertMapKey(mapKey);
         if(containKeys(mapKey, null)){
-            return cacheMap.get(mapKey).entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, s -> clazz.cast(s.getValue())));
+            return AfterGetAll(mapKey, cacheMap.get(mapKey).entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, s -> clazz.cast(s.getValue()))));
         }
         return null;
+    }
+
+    /**
+     * 非redis的情况，存在过期存储的情况，需要判断是否过期，并删除
+     * @param mapKey
+     * @param value
+     * @param <T>
+     * @return
+     */
+    private static <T> Map<String, T> AfterGetAll(String mapKey, Map<String, T> value){
+        if(!withRedisson && !ObjectUtils.isEmpty(value)){
+            value.entrySet().stream().forEach(es -> {
+                if(validExpiryTime(mapKey, es.getKey())){
+                    value.remove(mapKey);
+                }
+            });
+        }
+        return value;
     }
 
     /**
@@ -133,7 +157,7 @@ public class CacheUtil {
         if(containKeys(mapKey, null)){
             rMap = cacheMap.get(mapKey);
         }else{
-            rMap = redissonClient == null ? new ConcurrentHashMap<>(INITIAL_CAPACITY) : redissonClient.getMap(mapKey);
+            rMap = withRedisson? redissonClient.getMap(mapKey) : new ConcurrentHashMap<>(INITIAL_CAPACITY);
             cacheMap.put(mapKey, rMap);
         }
         rMap.put(cacheKey, value);
@@ -149,7 +173,7 @@ public class CacheUtil {
      */
     public static void put(String mapKey, String cacheKey, Object value, Long ttl, TimeUnit unit){
         AssertMapKey(mapKey);
-        if(redissonClient != null){
+        if(withRedisson){
             RMapCache<String, Object> rMap;
             if(containKeys(mapKey, null)){
                 rMap = (RMapCache<String, Object>) cacheMap.get(mapKey);
@@ -181,4 +205,19 @@ public class CacheUtil {
         }
     }
 
+    /**
+     * 是否过期
+     * @param mapKey
+     * @param cacheKey
+     * @return
+     */
+    private static boolean validExpiryTime(String mapKey, String cacheKey) {
+        Long expiryTime = containKeys(mapKey, cacheKey + HOLD_TIME)? (Long) cacheMap.get(mapKey).get(cacheKey + HOLD_TIME) : -1L;
+        if(expiryTime > 0 && System.currentTimeMillis() > expiryTime){
+            clear(mapKey, cacheKey);
+            clear(mapKey, cacheKey + HOLD_TIME);
+            return true;
+        }
+        return false;
+    }
 }
