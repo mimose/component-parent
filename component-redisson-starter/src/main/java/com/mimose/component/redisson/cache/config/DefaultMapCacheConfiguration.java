@@ -3,8 +3,10 @@ package com.mimose.component.redisson.cache.config;
 import com.mimose.component.redisson.cache.util.CacheUtil;
 import com.mimose.component.redisson.common.config.RedissonClientConfiguration;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 
 import javax.annotation.PostConstruct;
 
@@ -16,6 +18,7 @@ import javax.annotation.PostConstruct;
 @Slf4j
 @Configuration
 @ConditionalOnMissingBean(value = RedissonClientConfiguration.class)
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE + 101)
 public class DefaultMapCacheConfiguration {
 
     @PostConstruct

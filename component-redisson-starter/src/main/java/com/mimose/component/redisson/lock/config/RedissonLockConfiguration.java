@@ -6,9 +6,11 @@ import com.mimose.component.redisson.lock.api.client.RedissonDistributedLocker;
 import com.mimose.component.redisson.lock.util.LockUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 
 /**
  * @Description redisson锁装配
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 @ConditionalOnBean(value = RedissonClientConfiguration.class)
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE + 102)
 public class RedissonLockConfiguration {
 
     /**

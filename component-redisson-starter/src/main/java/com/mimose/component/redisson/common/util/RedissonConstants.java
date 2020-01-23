@@ -11,6 +11,8 @@ public class RedissonConstants {
     public static final String OPEN_REDIS = "redisson.open";
     /** REDISSON OPEN **/
     public static final String OPEN = "true";
+    /** REDISSON CLOSE **/
+    public static final String CLOSE = "false";
 
 
     /** REDISSON BASE CONFIG PREFIX **/
@@ -19,6 +21,8 @@ public class RedissonConstants {
     public static final String DEFAULT_CACHE_CONFIG_PREFIX = "redisson.cache";
     /** REDISSON LOCK CONFIG PREFIX **/
     public static final String DEFAULT_LOCK_CONFIG_PREFIX = "redisson.lock";
+    /** REDISSON CACHE DEFAULT CONFIG LOCATION PREFIX**/
+    public static final String DEFAULT_CONFIGLOCATION_PREFIX = "classpath:";
     /** REDISSON CACHE DEFAULT CONFIG LOCATION **/
     public static final String DEFAULT_CACHE_CONFIGLOCATION = "classpath:redisson-cache.yml";
     /** REDISSON LOCK DEFAULT CONFIG LOCATION **/

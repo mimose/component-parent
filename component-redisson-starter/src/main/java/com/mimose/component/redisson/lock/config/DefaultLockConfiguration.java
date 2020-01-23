@@ -7,12 +7,14 @@ import com.mimose.component.redisson.common.config.RedissonClientConfiguration;
 import com.mimose.component.redisson.lock.api.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -38,6 +40,7 @@ import java.util.stream.Collectors;
 @Configuration
 @ConditionalOnMissingBean(value = RedissonClientConfiguration.class)
 @EnableConfigurationProperties(DefaultLockProperties.class)
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE + 102)
 public class DefaultLockConfiguration implements ResourceLoaderAware {
 
     private ResourceLoader resourceLoader;

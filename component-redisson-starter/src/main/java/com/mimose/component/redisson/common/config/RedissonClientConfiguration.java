@@ -8,11 +8,13 @@ import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.config.SentinelServersConfig;
 import org.redisson.config.SingleServerConfig;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 
 /**
  * @Description redisson客户端装配
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass(Config.class)
 @ConditionalOnProperty(name = RedissonConstants.OPEN_REDIS, havingValue = RedissonConstants.OPEN)
 @EnableConfigurationProperties(RedissonBaseProperties.class)
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE + 50)
 public class RedissonClientConfiguration {
 
     /**

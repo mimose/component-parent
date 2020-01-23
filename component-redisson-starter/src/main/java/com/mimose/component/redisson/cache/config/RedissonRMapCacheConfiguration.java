@@ -5,8 +5,10 @@ import com.mimose.component.redisson.common.config.RedissonClientConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 
 import javax.annotation.PostConstruct;
 
@@ -18,6 +20,7 @@ import javax.annotation.PostConstruct;
 @Slf4j
 @Configuration
 @ConditionalOnBean(value = RedissonClientConfiguration.class)
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE + 101)
 public class RedissonRMapCacheConfiguration {
 
     @Autowired
