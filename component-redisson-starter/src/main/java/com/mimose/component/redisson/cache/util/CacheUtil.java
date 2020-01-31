@@ -2,6 +2,7 @@ package com.mimose.component.redisson.cache.util;
 
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -46,6 +47,18 @@ public class CacheUtil {
      * @return
      */
     public static boolean containKeys(String mapKey, String cacheKey){
+        if(withRedisson){
+            ConcurrentMap<String, Object> map = redissonClient.getMap(mapKey);
+            if(!CollectionUtils.isEmpty(map)){
+                if(StringUtils.isEmpty(cacheKey) || map.containsKey(cacheKey)){
+                    if(!cacheMap.containsKey(mapKey)){
+                        cacheMap.put(mapKey, map);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
         return cacheMap.containsKey(mapKey) && (StringUtils.isEmpty(cacheKey) || cacheMap.get(mapKey).containsKey(cacheKey));
     }
 
