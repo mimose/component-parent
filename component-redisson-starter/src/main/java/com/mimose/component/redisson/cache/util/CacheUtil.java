@@ -51,9 +51,7 @@ public class CacheUtil {
             ConcurrentMap<String, Object> map = redissonClient.getMap(mapKey);
             if(!CollectionUtils.isEmpty(map)){
                 if(StringUtils.isEmpty(cacheKey) || map.containsKey(cacheKey)){
-                    if(!cacheMap.containsKey(mapKey)){
-                        cacheMap.put(mapKey, map);
-                    }
+                    cacheMap.put(mapKey, map);
                     return true;
                 }
             }
