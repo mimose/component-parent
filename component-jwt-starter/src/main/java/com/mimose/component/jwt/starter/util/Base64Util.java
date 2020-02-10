@@ -716,7 +716,7 @@ public class Base64Util extends BaseNCodec {
      */
     public static byte[] encodeInteger(final BigInteger bigInt) {
         if (bigInt == null) {
-            throw new NullPointerException("encodeInteger called with null parameter");
+            throw new IllegalArgumentException("encodeInteger called with null parameter");
         }
         return encodeBase64(toIntegerBytes(bigInt), false);
     }

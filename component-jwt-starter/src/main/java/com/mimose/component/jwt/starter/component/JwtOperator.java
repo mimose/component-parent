@@ -123,7 +123,7 @@ public class JwtOperator {
             String algorithm = this.jwtStorage.getJwtProperties().getAlgorithm();
             Key key;
             SignatureAlgorithm signatureAlgorithm;
-            String secret = encrypt? this.jwtStorage.getJwtProperties().getEncryptSecret() : this.jwtStorage.getJwtProperties().getEncryptSecret();
+            String secret = encrypt? this.jwtStorage.getJwtProperties().getEncryptSecret() : this.jwtStorage.getJwtProperties().getDecryptSecret();
             if(StringUtils.isEmpty(algorithm) || AlgorithmEnum.HS256.getKey().equals(algorithm)){
                 byte[] keyBytes = jwtStorage.getJwtProperties().getEncryptSecret().getBytes();
                 key = Keys.hmacShaKeyFor(keyBytes);
@@ -136,7 +136,7 @@ public class JwtOperator {
             }
             return new Pair<>(key, signatureAlgorithm);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("getKSPair error", e);
             return null;
         }
     }

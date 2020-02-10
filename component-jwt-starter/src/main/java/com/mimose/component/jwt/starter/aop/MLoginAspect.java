@@ -7,9 +7,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -55,7 +53,7 @@ public class MLoginAspect {
             // 3. 如果校验成功，那么就将用户的信息设置到request的attribute里面
             Claims claims = jwtOperator.getClaimsFromToken(token);
             request.setAttribute("userInfo", claims);
-        } catch (Throwable throwable) {
+        } catch (Exception e) {
             throw new JwtCheckException("Token不合法");
         }
     }
@@ -74,7 +72,7 @@ public class MLoginAspect {
             if(CollectionUtils.isEmpty(userRoles) || !Collections.disjoint(roles , userRoles)){
                 throw new JwtCheckException("没有权限");
             }
-        } catch (Throwable throwable) {
+        } catch (Exception e) {
             throw new JwtCheckException("没有权限");
         }
     }

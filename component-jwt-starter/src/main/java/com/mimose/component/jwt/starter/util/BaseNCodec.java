@@ -310,7 +310,7 @@ public abstract class BaseNCodec {
      */
     public Object encode(final Object obj) throws Exception {
         if (!(obj instanceof byte[])) {
-            throw new Exception("Parameter supplied to Base-N encode is not a byte[]");
+            throw new IllegalArgumentException("Parameter supplied to Base-N encode is not a byte[]");
         }
         return encode((byte[]) obj);
     }
@@ -355,7 +355,7 @@ public abstract class BaseNCodec {
         } else if (obj instanceof String) {
             return decode((String) obj);
         } else {
-            throw new Exception("Parameter supplied to Base-N decode is not a byte[] or a String");
+            throw new IllegalArgumentException("Parameter supplied to Base-N decode is not a byte[] or a String");
         }
     }
 

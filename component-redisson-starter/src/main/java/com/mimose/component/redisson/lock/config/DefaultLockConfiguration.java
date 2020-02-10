@@ -1,6 +1,5 @@
 package com.mimose.component.redisson.lock.config;
 
-import com.google.common.collect.Lists;
 import com.mimose.component.redisson.lock.api.client.DefaultDistributedLocker;
 import com.mimose.component.redisson.lock.util.LockUtil;
 import com.mimose.component.redisson.common.config.RedissonClientConfiguration;

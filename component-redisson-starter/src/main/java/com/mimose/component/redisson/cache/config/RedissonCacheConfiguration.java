@@ -41,7 +41,6 @@ public class RedissonCacheConfiguration {
                 return null;
             }
             RedissonSpringCacheManager redissonSpringCacheManager = new RedissonSpringCacheManager(redissonClient, configLocation);
-            URL resource = this.getClass().getClassLoader().getResource("redisson-cache.yml");
             log.info("start redisson cache manager success");
             return redissonSpringCacheManager;
         } catch (Exception e) {

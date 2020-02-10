@@ -49,11 +49,9 @@ public class CacheUtil {
     public static boolean containKeys(String mapKey, String cacheKey){
         if(withRedisson){
             ConcurrentMap<String, Object> map = redissonClient.getMap(mapKey);
-            if(!CollectionUtils.isEmpty(map)){
-                if(StringUtils.isEmpty(cacheKey) || map.containsKey(cacheKey)){
-                    cacheMap.put(mapKey, map);
-                    return true;
-                }
+            if(!CollectionUtils.isEmpty(map) && (StringUtils.isEmpty(cacheKey) || map.containsKey(cacheKey))){
+                cacheMap.put(mapKey, map);
+                return true;
             }
             return false;
         }
@@ -98,10 +96,8 @@ public class CacheUtil {
      * @return
      */
     private static <T> T AfterGet(String mapKey, String cacheKey, T value) {
-        if(!withRedisson && !ObjectUtils.isEmpty(value)){
-            if(validExpiryTime(mapKey, cacheKey)){
-                return null;
-            }
+        if(!withRedisson && !ObjectUtils.isEmpty(value) && validExpiryTime(mapKey, cacheKey)){
+            return null;
         }
         return value;
     }
