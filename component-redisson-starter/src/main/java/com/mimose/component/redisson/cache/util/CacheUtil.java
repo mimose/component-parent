@@ -1,6 +1,7 @@
 package com.mimose.component.redisson.cache.util;
 
 import org.redisson.api.RMapCache;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -41,6 +42,11 @@ public class CacheUtil {
     private static final String HOLD_TIME = "_HOLD_TIME";
 
     /**
+     * RMapCache的MapKey存储Key名
+     */
+    private static final String RMAPCACHE_MAP_KEYS = "RMAPCACHE_MAP_KEYS";
+
+    /**
      * 是否存在缓存
      * @param mapKey    RMap-key
      * @param cacheKey  RMap-entry-key
@@ -48,7 +54,13 @@ public class CacheUtil {
      */
     public static boolean containKeys(String mapKey, String cacheKey){
         if(withRedisson){
-            ConcurrentMap<String, Object> map = redissonClient.getMap(mapKey);
+            ConcurrentMap<String, Object> map;
+            RSet<String> rMapCacheMapKeys = redissonClient.getSet(RMAPCACHE_MAP_KEYS);
+            if(CollectionUtils.isEmpty(rMapCacheMapKeys) || !rMapCacheMapKeys.contains(mapKey)){
+                map = redissonClient.getMap(mapKey);
+            }else{
+                map = redissonClient.getMapCache(mapKey);
+            }
             if(!CollectionUtils.isEmpty(map) && (StringUtils.isEmpty(cacheKey) || map.containsKey(cacheKey))){
                 cacheMap.put(mapKey, map);
                 return true;
@@ -187,6 +199,9 @@ public class CacheUtil {
             }else{
                 rMap = redissonClient.getMapCache(mapKey);
                 cacheMap.put(mapKey, rMap);
+                // 存储RMapCache的mapKey
+                RSet<String> rMapCacheMapKeys = redissonClient.getSet(RMAPCACHE_MAP_KEYS);
+                rMapCacheMapKeys.add(mapKey);
             }
             rMap.put(cacheKey, value, ttl, unit);
         }else{

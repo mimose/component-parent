@@ -60,7 +60,9 @@ public class DefaultDistributedLocker implements DistributedLocker<ReentrantLock
 
     @Override
     public void unlock(ReentrantLock lock) {
-        lock.unlock();
+        if(lock.isLocked()){
+            lock.unlock();
+        }
     }
 
     public void setDefaultRentrantLock(ReentrantLock defaultRentrantLock) {

@@ -15,6 +15,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @Description redisson客户端装配
@@ -40,6 +41,9 @@ public class RedissonClientConfiguration {
             if(StringUtils.isNotBlank(redissonBaseProperties.getMasterName())){
                 // 哨兵模式自动装配
                 log.info("start redisson client with sentinel server ...");
+                if(ObjectUtils.isEmpty(redissonBaseProperties.getSentinelAddresses())){
+                    throw new RuntimeException("redisson properties (sentinel address) is empty");
+                }
                 SentinelServersConfig serverConfig = config.useSentinelServers().addSentinelAddress(redissonBaseProperties.getSentinelAddresses())
                         .setMasterName(redissonBaseProperties.getMasterName())
                         .setTimeout(redissonBaseProperties.getTimeout())
@@ -63,12 +67,15 @@ public class RedissonClientConfiguration {
                 if(StringUtils.isNotBlank(redissonBaseProperties.getPassword())) {
                     serverConfig.setPassword(redissonBaseProperties.getPassword());
                 }
+            }else{
+                throw new IllegalStateException("Incomplete configuration, unrecognized by redisson");
             }
             RedissonClient redissonClient = Redisson.create(config);
             log.info("start redisson client success");
             return redissonClient;
         } catch (Exception e) {
             log.error("start redisson client error", e);
+            System.exit(1);
             return null;
         }
     }
