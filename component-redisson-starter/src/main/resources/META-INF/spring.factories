@@ -3,4 +3,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.mimose.compon
   com.mimose.component.redisson.lock.config.DefaultLockConfiguration,\
   com.mimose.component.redisson.cache.config.RedissonCacheConfiguration,\
   com.mimose.component.redisson.cache.config.RedissonRMapCacheConfiguration,\
-  com.mimose.component.redisson.cache.config.DefaultMapCacheConfiguration
+  com.mimose.component.redisson.cache.config.DefaultMapCacheConfiguration,\
+  com.mimose.component.redisson.common.config.RedissonUtilConfiguration

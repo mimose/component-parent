@@ -19,6 +19,7 @@
     <modules>
         <module>component-jwt-starter</module>
         <module>component-redisson-starter</module>
+        <module>component-db-mysql-starter</module>
     </modules>
 
     <properties>

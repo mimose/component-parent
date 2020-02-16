@@ -1,5 +1,6 @@
 package com.mimose.component.redisson.cache.util;
 
+import org.redisson.api.RMap;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
@@ -82,6 +83,26 @@ public class CacheUtil {
                 cacheMap.remove(mapKey);
             }else{
                 cacheMap.get(mapKey).remove(cacheKey);
+            }
+            clearRedisson(mapKey, cacheKey);
+        }
+    }
+
+    private static void clearRedisson(String mapKey, String cacheKey){
+        RSet<String> rMapCacheMapKeys = redissonClient.getSet(RMAPCACHE_MAP_KEYS);
+        if(CollectionUtils.isEmpty(rMapCacheMapKeys) || !rMapCacheMapKeys.contains(mapKey)){
+            RMap<String, Object> map = redissonClient.getMap(mapKey);
+            if(StringUtils.isEmpty(cacheKey)){
+                map.clear();
+            }else{
+                map.remove(cacheKey);
+            }
+        }else{
+            RMapCache<String, Object> mapCache = redissonClient.getMapCache(mapKey);
+            if(StringUtils.isEmpty(cacheKey)){
+                mapCache.clear();
+            }else{
+                mapCache.remove(cacheKey);
             }
         }
     }
