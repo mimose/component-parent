@@ -89,6 +89,9 @@ public class CacheUtil {
     }
 
     private static void clearRedisson(String mapKey, String cacheKey){
+        if(!withRedisson){
+            return;
+        }
         RSet<String> rMapCacheMapKeys = redissonClient.getSet(RMAPCACHE_MAP_KEYS);
         if(CollectionUtils.isEmpty(rMapCacheMapKeys) || !rMapCacheMapKeys.contains(mapKey)){
             RMap<String, Object> map = redissonClient.getMap(mapKey);
