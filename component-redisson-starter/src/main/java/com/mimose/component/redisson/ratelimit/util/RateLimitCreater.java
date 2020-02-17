@@ -34,6 +34,12 @@ public class RateLimitCreater {
         throw new IllegalStateException("fail to set RRateLimter");
     }
 
+    /**
+     * 限流规则一：若限流，则直接拒绝（在ask秒里面尝试）
+     * @param limiter
+     * @param ask
+     * @return
+     */
     public static boolean tryAcquire(String limiter, long ask){
         RRateLimiter rRateLimiter = create(limiter);
         if(rRateLimiter.isExists()){
@@ -42,11 +48,29 @@ public class RateLimitCreater {
         return false;
     }
 
+    /**
+     * 限流规则一：若限流，则直接拒绝（在ask个TimeUnit时间里面尝试）
+     * @param limiter
+     * @param ask
+     * @param timeUnit
+     * @return
+     */
     public static boolean tryAcquire(String limiter, long ask, TimeUnit timeUnit){
         RRateLimiter rRateLimiter = create(limiter);
         if(rRateLimiter.isExists()){
             return rRateLimiter.tryAcquire(ask, timeUnit);
         }
         return false;
+    }
+
+    /**
+     * 限流规则二：若限制，则一直等待
+     * @param limiter
+     */
+    public static void acquire(String limiter){
+        RRateLimiter rRateLimiter = create(limiter);
+        if(rRateLimiter.isExists()){
+            rRateLimiter.acquire();
+        }
     }
 }
