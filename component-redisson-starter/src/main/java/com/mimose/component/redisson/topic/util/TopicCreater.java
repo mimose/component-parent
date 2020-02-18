@@ -26,7 +26,12 @@ public class TopicCreater {
     }
 
     public static long publish(String topic, Object message){
-        return create(topic).publish(message);
+        RTopic rTopic = create(topic);
+        if(rTopic.countListeners() == 0){
+            return 0;
+        }else{
+            return create(topic).publish(message);
+        }
     }
 
 }
