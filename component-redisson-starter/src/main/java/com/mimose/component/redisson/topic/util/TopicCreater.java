@@ -25,4 +25,8 @@ public class TopicCreater {
         return redissonClient.getTopic(topic);
     }
 
+    public static long publish(String topic, Object message){
+        return create(topic).publish(message);
+    }
+
 }
