@@ -1,5 +1,6 @@
 package com.mimose.component.redisson.common.config;
 
+import com.mimose.component.redisson.cache.util.CacheUtil;
 import com.mimose.component.redisson.ratelimit.util.RateLimitCreater;
 import com.mimose.component.redisson.topic.util.TopicCreater;
 import lombok.extern.slf4j.Slf4j;
@@ -28,17 +29,33 @@ public class RedissonUtilConfiguration {
 
     @PostConstruct
     public void afterClient(){
-        startRRateLimiterCreater();
-        startTopicCreater();
+        configRMapCache();
+        configRRateLimiterCreater();
+        configTopicCreater();
     }
 
-    private void startRRateLimiterCreater() {
+    /**
+     * redisson基本存取配置类
+     */
+    private void configRMapCache() {
+//        log.info("start init rMap cache util ...");
+        CacheUtil.setRedissonClient(redissonClient);
+        log.info("start init rMap cache util success");
+    }
+
+    /**
+     * redisson限流器
+     */
+    private void configRRateLimiterCreater() {
         log.info("start init RRateLimiter creater ...");
         RateLimitCreater.setRedissonClient(redissonClient);
         log.info("start init RRateLimiter creater success");
     }
 
-    private void startTopicCreater() {
+    /**
+     * redisson订阅工具
+     */
+    private void configTopicCreater() {
         log.info("start init topic creater ...");
         TopicCreater.setRedissonClient(redissonClient);
         log.info("start init topic creater success");
