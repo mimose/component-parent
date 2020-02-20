@@ -47,7 +47,7 @@ public class RedissonUtilConfiguration {
      * redisson限流器
      */
     private void configRRateLimiterCreater() {
-        log.info("start init RRateLimiter creater ...");
+//        log.info("start init RRateLimiter creater ...");
         RateLimitCreater.setRedissonClient(redissonClient);
         log.info("start init RRateLimiter creater success");
     }
@@ -56,7 +56,7 @@ public class RedissonUtilConfiguration {
      * redisson订阅工具
      */
     private void configTopicCreater() {
-        log.info("start init topic creater ...");
+//        log.info("start init topic creater ...");
         TopicCreater.setRedissonClient(redissonClient);
         log.info("start init topic creater success");
     }
